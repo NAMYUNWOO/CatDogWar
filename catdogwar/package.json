@@ -1,0 +1,37 @@
+{
+  "name": "catdogwar",
+  "version": "1.0.0",
+  "description": "\"cat dog war\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NAMYUNWOO/CatDogWar.git"
+  },
+  "keywords": [
+    "\"catdogwar\""
+  ],
+  "author": "\"namyunwoo\"",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NAMYUNWOO/CatDogWar/issues"
+  },
+  "homepage": "https://github.com/NAMYUNWOO/CatDogWar#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "debug": "^3.1.0",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "install": "^0.10.4",
+    "mongoose": "^5.0.4",
+    "morgan": "^1.9.0",
+    "mysql": "^2.15.0",
+    "npm": "^5.6.0",
+    "serve-favicon": "^2.4.5",
+    "socket.io": "^2.0.4"
+  }
+}

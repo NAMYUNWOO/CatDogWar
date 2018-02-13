@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <title>CAT vs DOG</title>
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/UnityProgress.js"></script>
+  <script src="/UnityLoader.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!--
+  <link rel="shortcut icon" href="TemplateData/favicon.ico">
+  <link rel="stylesheet" href="TemplateData/style.css">
+  <script src="TemplateData/UnityProgress.js"></script>
+  <script src="Build/UnityLoader.js"></script>
+-->
+<script>
+var gameInstance = UnityLoader.instantiate("gameContainer", "/pushpullweb.json", {onProgress: UnityProgress});
+</script>
+</head>
+<body>
+<nav class="navbar navbar-light bg-light justify-content-between">
+  <a class="navbar-brand">Cat vs Dog</a>
+<form action="/logout" method="post">
+  <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Log out"></input>
+</form>
+</nav>
+  <div class="container" style="margin-top:5rem;margin-bottom:5rem;">
+    <div class="row"  align="center">
+      <div class="col-md-12" align="center" >
+        <table class="table text-center"  style="width: 740px;">
+          <thead class="thead-light">
+          <tr>
+            <th>Total Cat Score</th>
+            <th>&nbsp;&nbsp;&nbsp;</th>
+            <th>Total Dog Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr align="center">
+            <td id="catScore"><%=racesInfo.cat%></td>
+            <th>&nbsp;&nbsp;&nbsp;</th>
+            <td id="dogScore"><%=racesInfo.dog%></td>
+          </tr>
+          </tbody>
+        </table>
+        <br><br>
+        <table class="table text-center" style="width: 360px;">
+          <thead>
+            <tr>
+              <th id="catScoreCur">0</th>
+              <th> : </th>
+              <th id="dogScoreCur">0</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="col-md-12" style="width: 740px; height: 460px">
+        <div class="webgl-content">
+          <div id="gameContainer" style="width: 640px; height: 360px"></div>
+          <div class="footer">
+        <!--<div class="webgl-logo"></div>-->
+            <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+            <div class="title">CAT.DOG.WAR</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 text-center">
+        <table class="table" align="center" style="width: 740px;">
+          <thead class="thead-light">
+            <tr>
+              <th>up</th>
+              <th>down</th>
+              <th>push-beam</th>
+              <th>pull-beam</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>&uarr;</td>
+              <td>&darr;</td>
+              <td id='pushKey'>Q</td>
+              <td id='pullKey'>W</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <br><br>
+      <div class="col-md-12" >
+        <table class="table text-center" style="width: 360px;">
+          <thead class="thead-light">
+            <tr>
+              <th>Win</th>
+              <th>Tie</th>
+              <th>Lose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="win"><%=usrInfo.win%></td>
+              <td id="tie"><%=usrInfo.tie%></td>
+              <td id="lose"><%=usrInfo.lose%></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  if (document.location.href.endsWith("cat")){
+    document.getElementById('pushKey').innerHTML = "W";
+    document.getElementById('pullKey').innerHTML = "Q";
+  }
+  var socket = io();
+
+  socket.on("updateTotScore", function(data) {
+    var catScore = data.cat;
+    var dogScore = data.dog;
+    var catScore_tot = document.getElementById('catScore').innerHTML;
+    var dogScore_tot = document.getElementById('dogScore').innerHTML;
+    document.getElementById('catScore').innerHTML = parseInt(catScore_tot)+parseInt(catScore);
+    document.getElementById('dogScore').innerHTML = parseInt(dogScore_tot)+parseInt(dogScore);
+
+    //var catScore_cur = document.getElementById('catScoreCur').innerHTML;
+    //var dogScore_cur = document.getElementById('dogScoreCur').innerHTML;
+    //document.getElementById('catScoreCur').innerHTML = parseInt(catScore_cur)+parseInt(catScore);
+    //document.getElementById('dogScoreCur').innerHTML = parseInt(dogScore_cur)+parseInt(dogScore);
+  });
+  </script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</body>
+</html>

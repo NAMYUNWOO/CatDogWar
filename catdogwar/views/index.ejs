@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script>
+  var clickedSignUp = false;
+
+
+  function catSelect(){
+    var imgfile = '/images/cat.png';
+    var imgfile_non = '/images/dog_non.png';
+    var selectedOpt = document.getElementById('option1');
+    var charimg = document.getElementById('catimg');
+    var charimg_non = document.getElementById('dogimg');
+    var selecttxt = document.getElementById('selecttxt');
+    var nick = document.getElementById('nick');
+    selecttxt.innerHTML = "cat selected";
+    charimg.setAttribute("src", imgfile);
+    charimg_non.setAttribute("src", imgfile_non);
+    nick.focus();
+
+  }
+
+  function dogSelect(){
+    var imgfile = '/images/dog.png';
+    var imgfile_non = '/images/cat_non.png';
+    var selectedOpt = document.getElementById('option2');
+    var charimg = document.getElementById('dogimg');
+    var charimg_non = document.getElementById('catimg');
+    var selecttxt = document.getElementById('selecttxt');
+    var nick = document.getElementById('nick');
+    selecttxt.innerHTML = "dog selected";
+    charimg.setAttribute("src", imgfile);
+    charimg_non.setAttribute("src", imgfile_non);
+    nick.focus();
+
+  }
+  function signIn(){
+    var email = document.getElementById('email');
+    var pwd = document.getElementById('pw');
+    if(email.value == ""){
+      alert("please fill in email..");
+      email.focus();
+      return
+    }
+    if(pwd.value == ""){
+      alert("please fill in password..");
+      pwd.focus();
+      return
+    }
+    frm1.submit();
+
+  }
+
+  function signUp(){
+    if(clickedSignUp === false){
+
+      var SignInBtn = document.getElementById('SignIn');
+      var pwre = document.getElementById('pw_re');
+      var gth = document.getElementById('groupsTohide');
+      gth.setAttribute("class","")
+      pwre.setAttribute("type", "password");
+      SignInBtn.setAttribute("type", "hidden");
+      clickedSignUp = true;
+      pwre.focus();
+      return;
+    }
+
+    var email = document.getElementById('email');
+    var pwd = document.getElementById('pw');
+    var pwd_re = document.getElementById('pw_re');
+    var catSelect = document.getElementById('option1');
+    var dogSelect = document.getElementById('option2');
+    var nick = document.getElementById('nick');
+    if(!validateEmail(email.value)){
+
+      alert("email is not valid type");
+      email.focus();
+      return;
+    }
+    if(pwd.value == ""){
+      alert("please fill in password");
+      pwd.focus();
+      return
+    }
+    if(pwd_re.value == ""){
+      alert("please fill in password check");
+      pw_re.focus();
+      return
+    }
+    if(pwd.value != pwd_re.value){
+      alert("password check is not valid");
+      pwd.focus();
+      return
+    }
+
+    if (catSelect.checked == false && dogSelect.checked==false){
+      alert("please select your character");
+      catSelect.focus();
+      return;
+    }
+    if (nick.value == ""){
+      alert("please type in your characterName");
+      nick.focus();
+      return;
+    }
+
+    frm1.submit();
+
+  }
+  function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+  </script>
+
+  <title>CAT vs DOG</title>
+</head>
+<body style="background-color:#212529">
+
+  <div class="container">
+    <div class="col-md-12" align="center">
+
+      <div style="width: 20rem;margin-top:5rem ;background-color:#212529">
+
+        <form action="/" method="post" name="frm1">
+          <div class="d-none" id ="groupsTohide">
+          <img src="/images/cat_non.PNG" id="catimg" style="width:5rem; height:5rem;"/>&nbsp;&nbsp;&nbsp;<img src="/images/dog_non.PNG" id="dogimg" style="width:5rem; height:5rem;"/>
+
+              <p id="selecttxt" style="color:white; margin-top:1rem;"><p/>
+              <label class="btn btn-light"  onclick="catSelect()">
+                <input type="radio" name="races" id="option1" onclick="catSelect()" value="cat"> CAT</label>
+              &nbsp;&nbsp;&nbsp;
+              <label class="btn btn-light"  onclick="dogSelect()">
+                <input type="radio" name="races" id="option2"  onclick="dogSelect()" value="dog" > DOG</label>
+
+            <input type="textarea" id="nick" name="nick"  placeholder="Character Name" style="margin-bottom:20px;" />
+          </div>
+          <input type="text" id="email" name="email" class="form-control" placeholder="User Email" style="margin-bottom:5px;" />
+          <input type="password" id="pw" name="pw" class="form-control" placeholder="Password" style="margin-bottom:5px;"/>
+          <input type="hidden" id="pw_re" name="pw_re" class="form-control" placeholder="Password check" />
+          <br>
+          <input type="submit" id="SignIn" class="form-control btn-secondary" onclick=signIn() value="Sign In" style="margin-bottom:10px;"/>
+          <input type="button" id="SignUp" class="form-control btn-outline-warning" onclick="signUp()" value="Sign up"/>
+        </form>
+        <br>
+        <a href="/demogame/cat">DemoGame(Cat)</a>&nbsp;&nbsp;&nbsp;<a href="/demogame/dog">DemoGame(Dog)</a>
+
+      </div>
+    </div>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
