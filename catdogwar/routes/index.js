@@ -86,7 +86,7 @@ router.post('/scoreAdd',(req,res,next)=>{
 
 router.post('/gameresult',(req,res,next)=>{
     if(!req.session.email)
-        res.send('invalid access');
+        res.send('invalid access');return;
     var win = parseInt(req.body.win);
     var tie = parseInt(req.body.tie);
     var lose = parseInt(req.body.lose);
