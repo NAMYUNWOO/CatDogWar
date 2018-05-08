@@ -153,7 +153,7 @@ router.get('/demogame/:races', async (req,res,next)=>{
     var racesObj ={};
     try{
         const conn = await pool.connect();
-        const rows = await conn.query(sqlraces);
+        const {rows} = await conn.query(sqlraces);
         if(rows.length == 0){res.send('no id or match');};
         conn.release();
         for(let idx = 0 ; idx < rows.length;idx++){
@@ -197,7 +197,7 @@ router.get('/game/:races', async (req,res,next)=>{
     var racesObj ={};
     try{
         const conn = await pool.connect();
-        const rows0 = await conn.query(sqlraces);
+        const rows0 = await conn.query(sqlraces).rows;
         if(rows0.length == 0){res.send('no id or match');};
         usrObj.email =rows0[0].email;
         usrObj.nick =rows0[0].nick;
@@ -206,7 +206,7 @@ router.get('/game/:races', async (req,res,next)=>{
         usrObj.tie =rows0[0].tie;
         usrObj.coin =rows0[0].coin;
 
-        const rows = conn.query(sqlraces,(err,rows));
+        const {rows} = conn.query(sqlraces,(err,rows));
         conn.release();
         for(let idx = 0 ; idx < rows.length;idx++){
             racesObj[rows[idx].races]=rows[idx].coin;
@@ -252,16 +252,16 @@ router.get('/game/:races', async (req,res,next)=>{
 
 router.post('/',async (req,res,next)=>{
     console.log("main page");
-    var email = "asdfasdf@nasdfas.com";//req.body.email;
+    var email = req.body.email; //"asdfasdf@nasdfas.com";
     var pwd = req.body.pw;
     var pwdre = req.body.pw_re;
     if(pwdre==""){
         console.log("sign in")
-        var sql = 'select * from Player where email=($1) and pwd=($2)';
+        var sql = "select * from Player where email=($1) and pwd=($2)";
         var arr = [email,pwd];
         try{
             const conn = await pool.connect();
-            const rows = await conn.query(sql,arr);
+            const {rows} = await conn.query(sql,arr);
             if(rows.length == 0){res.send('no email or password does not match');return;};
             req.session.email = rows[0].email;
             req.session.races = rows[0].races;
@@ -295,8 +295,8 @@ router.post('/',async (req,res,next)=>{
         var sqlcheck = 'select * from Player where email=($1)';
         try{
             const conn = await pool.connect();
-            const rows0 = await conn.query(sqlcheck,[email]);
-            if(rows0.length != 0){
+            var {rows} = await conn.query(sqlcheck,[email]);
+            if(rows.length != 0){
                 conn.release();
                 res.send('email is already registered');
                 return;
