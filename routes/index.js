@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
 var io = require('../app.js').io;
-const mongoose = require('mongoose');
 var mysql = require('mysql');
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true
+});
+/*
 var pool  = mysql.createPool({
     connectionLimit : 10,
     host            : 'localhost',
@@ -10,7 +15,7 @@ var pool  = mysql.createPool({
     password        : '****',
     database        : 'catdogwar'
 });
-
+*/
 router.get('/',(req,res,next)=>{
     if(req.session.email){
         var cntxt = {'email':req.session.email,
