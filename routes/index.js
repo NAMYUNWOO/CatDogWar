@@ -108,7 +108,7 @@ router.post('/gameresult',(req,res,next)=>{
     });
 });
 
-router.get('/demogame/:races',(req,res,next)=>{
+router.get('/demogame/:races', async (req,res,next)=>{
     var sqlraces = 'select * from Races';
     var racesObj ={};
     try{
