@@ -30,7 +30,7 @@ router.get('/myresult',(req,res,next)=>{
     res.send('end game');
 })
 
-router.post('/scoreAdd',(req,res,next)=>{
+router.post('/scoreAdd',async (req,res,next)=>{
     var useremail = "" ;
     if(!req.session.email){
         console.log('no user info');
@@ -47,9 +47,36 @@ router.post('/scoreAdd',(req,res,next)=>{
         usrScore = dogScore;
     else
         usrScore = catScore;
-    var sqlcat = "update Races set coin=coin+? where races ='cat'";
-    var sqldog = "update Races set coin=coin+? where races ='dog'";
-    var sqlusr = "update Player set coin=coin+? where email =?";
+    var sqlcat = "update Races set coin=coin+($1) where races ='cat'";
+    var sqldog = "update Races set coin=coin+($1) where races ='dog'";
+    var sqlusr = "update Player set coin=coin+($1) where email =($2)";
+    try{
+        const conn = await pool.connect();
+        await conn.query(sqlusr,[usrScore,useremail]);
+        //if(result.affectedRows== 0){console.log('user score input fail');};
+        if(dogZero){
+            // catScore only
+            await conn.query(sqlcat,[catScore]);
+            await conn.release();
+            res.send('');
+        }else if(catZero){
+            // dogScore only
+            await conn.query(sqldog,[dogScore]);
+            await conn.release();
+            res.send('');
+        }else{
+            // bothScore
+            await conn.query(sqlcat,[catScore])
+            await conn.query(sqldog,[dogScore])
+            conn.release();
+            res.send('');
+        
+        } 
+    }catch(err){
+        console.error(err);
+        res.send("Error"+err);
+    }
+    /*
     pool.getConnection((err,conn)=>{
         if(err){console.log(err);res.send(err);return;};
         conn.query(sqlusr,[usrScore,useremail],(err,result)=>{
@@ -87,16 +114,28 @@ router.post('/scoreAdd',(req,res,next)=>{
             }
         });
     });
+    */
 });
 
-router.post('/gameresult',(req,res,next)=>{
+router.post('/gameresult',async (req,res,next)=>{
     if(!req.session.email)
         res.send('invalid access');return;
     var win = parseInt(req.body.win);
     var tie = parseInt(req.body.tie);
     var lose = parseInt(req.body.lose);
     var useremail = req.session.email.toString();
-    var sql = "update Player set win=win+?,tie=tie+?,lose=lose+? where email =?";
+    var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3) where email=($4)";
+    try{
+        const conn = await pool.connect();
+        await conn.query(sql);
+        conn.release();
+        res.redirect('/');
+
+    }catch(err){
+        console.error(err);
+        res.send("Error"+err);
+    }
+    /*
     pool.getConnection((err,conn)=>{
         if(err){console.log(err);res.send(err);return;};
         conn.query(sql,[win,tie,lose,useremail],(err,result)=>{
@@ -106,16 +145,17 @@ router.post('/gameresult',(req,res,next)=>{
             res.redirect('/');
         });
     });
+    */
 });
 
 router.get('/demogame/:races', async (req,res,next)=>{
     var sqlraces = 'select * from Races';
     var racesObj ={};
     try{
-        const client = await pool.connect();
-        const rows = await client.query(sqlraces);
+        const conn = await pool.connect();
+        const rows = await conn.query(sqlraces);
         if(rows.length == 0){res.send('no id or match');};
-        client.release();
+        conn.release();
         for(let idx = 0 ; idx < rows.length;idx++){
             racesObj[rows[idx].races]=rows[idx].coin;
         }
@@ -148,13 +188,38 @@ router.get('/demogame/:races', async (req,res,next)=>{
 
 })
 
-router.get('/game/:races',(req,res,next)=>{
+router.get('/game/:races', async (req,res,next)=>{
     if(!req.session.email)
         res.send('invalid access');
-    var sqlusr = 'select * from Player where email =?';
+    var sqlusr = 'select * from Player where email=($1)';
     var usrObj ={};
     var sqlraces = 'select * from Races';
     var racesObj ={};
+    try{
+        const conn = await pool.connect();
+        const rows0 = await conn.query(sqlraces);
+        if(rows0.length == 0){res.send('no id or match');};
+        usrObj.email =rows0[0].email;
+        usrObj.nick =rows0[0].nick;
+        usrObj.win =rows0[0].win;
+        usrObj.lose =rows0[0].lose;
+        usrObj.tie =rows0[0].tie;
+        usrObj.coin =rows0[0].coin;
+
+        const rows = conn.query(sqlraces,(err,rows));
+        conn.release();
+        for(let idx = 0 ; idx < rows.length;idx++){
+            racesObj[rows[idx].races]=rows[idx].coin;
+        }
+        var context = {'userInfo':userObj, 'racesInfo':racesObj};
+        console.log(context);
+        res.render('game',context);
+
+    }catch (err){
+        console.error(err);
+        res.send("Error"+err);
+    }
+    /*
     pool.getConnection((err,conn)=>{
         if(err){console.log(err);res.send(err);return;};
         conn.query(sqlusr,[req.session.email],(err,rows)=>{
@@ -181,16 +246,26 @@ router.get('/game/:races',(req,res,next)=>{
             });
         });
     })
+    */
 
 })
 
-router.post('/',(req,res,next)=>{
+router.post('/',async (req,res,next)=>{
     var email = req.body.email;
     var pwd = req.body.pw;
     var pwdre = req.body.pw_re;
     if(pwdre==""){
-        var sql = 'select * from Player where email =? and pwd =?';
+        var sql = 'select * from Player where email =($1) and pwd =($2)';
         var arr = [email,pwd];
+        const conn = await pool.connect();
+        const rows = await conn.query(sql,arr);
+        if(rows.length == 0){res.send('no email or password does not match');return;};
+        req.session.email = rows[0].email;
+        req.session.races = rows[0].races;
+        console.log(rows);
+        conn.release();
+        res.redirect('/');
+        /*
         pool.getConnection((err,conn)=>{
             if(err){console.log(err);res.send(err);return;};
             conn.query(sql,arr,(err,rows)=>{
@@ -203,12 +278,26 @@ router.post('/',(req,res,next)=>{
                 res.redirect('/');
             });
         })
+        */
     }else{
         var nick = req.body.nick;
         var races = req.body.races;
         var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races) values(?,?,?,now(),0,0,0,0,?)";
         var arr = [email,nick,pwd,races];
         var sqlcheck = 'select * from Player where email =?';
+        const conn = await pool.connect();
+        const rows0 = await conn.query(sqlcheck,[email]);
+        if(rows0.length != 0){
+            conn.release();
+            res.send('email is already registered');
+            return;
+        };
+        await conn.query(sql,arr);
+        req.session.email = email;
+        req.session.races = races; 
+        conn.release();
+        res.redirect('/');
+        /*
         pool.getConnection((err,conn)=>{
             if(err){console.log(err);res.send(err);return;};
             conn.query(sqlcheck,[email],(err,rows)=>{
@@ -223,6 +312,7 @@ router.post('/',(req,res,next)=>{
                 })
             });
         })
+        */
     }
 
 });
