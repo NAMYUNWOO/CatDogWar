@@ -111,6 +111,25 @@ router.post('/gameresult',(req,res,next)=>{
 router.get('/demogame/:races',(req,res,next)=>{
     var sqlraces = 'select * from Races';
     var racesObj ={};
+    try{
+        const client = await pool.connect();
+        const rows = await client.query(sqlraces);
+        if(rows.length == 0){res.send('no id or match');};
+        client.release();
+        for(let idx = 0 ; idx < rows.length;idx++){
+            racesObj[rows[idx].races]=rows[idx].coin;
+        }
+        var context = { 'racesInfo':racesObj};
+        console.log(context);
+        res.render('demogame',context);
+
+    }catch (err){
+        console.error(err);
+        res.send("Error"+err);
+    }
+    /*
+    var sqlraces = 'select * from Races';
+    var racesObj ={};
     pool.getConnection((err,conn)=>{
         if(err){console.log(err);res.send(err);return;};
         conn.query(sqlraces,(err,rows)=>{
@@ -125,6 +144,7 @@ router.get('/demogame/:races',(req,res,next)=>{
             res.render('demogame',context);
         });
     })
+    */
 
 })
 
