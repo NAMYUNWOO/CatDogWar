@@ -206,10 +206,10 @@ router.get('/game/:races', async (req,res,next)=>{
         usrObj.tie =rows[0].tie;
         usrObj.coin =rows[0].coin;
 
-        const rows0 = await conn.query(sqlraces).rows;
+        var {rows} = await conn.query(sqlraces);
         conn.release();
-        for(let idx = 0 ; idx < rows0.length;idx++){
-            racesObj[rows0[idx].races]=rows0[idx].coin;
+        for(let idx = 0 ; idx < rows.length;idx++){
+            racesObj[rows[idx].races]=rows[idx].coin;
         }
         var context = {'userInfo':userObj, 'racesInfo':racesObj};
         console.log(context);
