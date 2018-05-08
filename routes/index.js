@@ -255,10 +255,11 @@ router.post('/',async (req,res,next)=>{
     var pwd = req.body.pw;
     var pwdre = req.body.pw_re;
     if(pwdre==""){
+        console.log("sign in")
         var sql = 'select * from Player where email=($1) and pwd=($2)';
         var arr = [email,pwd];
         const conn = await pool.connect();
-        const rows = await conn.query(sql,arr).rows;
+        const rows = await conn.query(sql,arr);
         if(rows.length == 0){res.send('no email or password does not match');return;};
         req.session.email = rows[0].email;
         req.session.races = rows[0].races;
@@ -280,6 +281,7 @@ router.post('/',async (req,res,next)=>{
         })
         */
     }else{
+        console.log("sign up");
         var nick = req.body.nick;
         var races = req.body.races;
         var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races) values(($1),($2),($3),now(),0,0,0,0,($4))";
