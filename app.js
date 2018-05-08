@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var app = express();
+const PORT = process.env.PORT
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 module.exports['io'] = io;
@@ -50,9 +51,12 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-server.listen(3003, function() {
-  console.log('Socket IO server listening on port 3003');
+app.listen(PORT);
+/*
+server.listen(PORT, function() {
+  console.log('Socket IO server listening on port %d',PORT);
 });
+*/
 // nodemon app.js
 
 module.exports['app'] = app;
