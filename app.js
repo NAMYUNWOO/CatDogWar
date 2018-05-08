@@ -50,13 +50,14 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-app.listen(PORT);
 /*
+app.listen(PORT);
+*/
+
 server.listen(PORT, function() {
   console.log('Socket IO server listening on port %d',PORT);
 });
-*/
+
 // nodemon app.js
 
 module.exports['app'] = app;

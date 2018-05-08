@@ -282,9 +282,9 @@ router.post('/',async (req,res,next)=>{
     }else{
         var nick = req.body.nick;
         var races = req.body.races;
-        var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races) values(?,?,?,now(),0,0,0,0,?)";
+        var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races) values(($1),($2),($3),now(),0,0,0,0,($4))";
         var arr = [email,nick,pwd,races];
-        var sqlcheck = 'select * from Player where email =?';
+        var sqlcheck = 'select * from Player where email =($1)';
         const conn = await pool.connect();
         const rows0 = await conn.query(sqlcheck,[email]);
         if(rows0.length != 0){
