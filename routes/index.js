@@ -197,19 +197,19 @@ router.get('/game/:races', async (req,res,next)=>{
     var racesObj ={};
     try{
         const conn = await pool.connect();
-        const rows0 = await conn.query(sqlraces).rows;
-        if(rows0.length == 0){res.send('no id or match');};
-        usrObj.email =rows0[0].email;
-        usrObj.nick =rows0[0].nick;
-        usrObj.win =rows0[0].win;
-        usrObj.lose =rows0[0].lose;
-        usrObj.tie =rows0[0].tie;
-        usrObj.coin =rows0[0].coin;
+        var {rows} = await conn.query(sqlusr,[req.session.email]);
+        if(rows.length == 0){res.send('no id or match');};
+        usrObj.email =rows[0].email;
+        usrObj.nick =rows[0].nick;
+        usrObj.win =rows[0].win;
+        usrObj.lose =rows[0].lose;
+        usrObj.tie =rows[0].tie;
+        usrObj.coin =rows[0].coin;
 
-        const {rows} = conn.query(sqlraces,(err,rows));
+        const rows0 = await conn.query(sqlraces).rows;
         conn.release();
-        for(let idx = 0 ; idx < rows.length;idx++){
-            racesObj[rows[idx].races]=rows[idx].coin;
+        for(let idx = 0 ; idx < rows0.length;idx++){
+            racesObj[rows0[idx].races]=rows0[idx].coin;
         }
         var context = {'userInfo':userObj, 'racesInfo':racesObj};
         console.log(context);
