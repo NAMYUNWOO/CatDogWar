@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 var io = require('../app.js').io;
-var mysql = require('mysql');
+//var mysql = require('mysql');
+var crypto = require('crypto');
 const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -261,17 +262,26 @@ router.post('/',async (req,res,next)=>{
     var pwdre = req.body.pw_re;
     if(pwdre==""){
         console.log("sign in")
-        var sql = "select * from Player where email=($1) and pwd=($2)";
-        var arr = [email,pwd];
+        var sql = "select * from Player where email=($1)";
+        var arr = [email];
         try{
             const conn = await pool.connect();
             const {rows} = await conn.query(sql,arr);
-            if(rows.length == 0){res.send('no email or password does not match');return;};
+            if(rows.length == 0){res.send('there is no user '+email);};
             req.session.email = rows[0].email;
             req.session.races = rows[0].races;
-            console.log(rows);
+            var salt = rows[0].salt;
+            var pwdHash = rows[0].pwd;
+            var userHashPass = crypto.createHash("sha512").update(pwd+salt).digest("hex");
             conn.release();
-            res.redirect('/');
+            if(userHashPass === pwdHash){
+                res.redirect('/');    
+                
+            }else{
+                res.send('wrong passward');
+            }  
+            
+            
         }catch (err){
             console.error(err);
             res.send("Error"+err);
@@ -294,8 +304,10 @@ router.post('/',async (req,res,next)=>{
         console.log("sign up");
         var nick = req.body.nick;
         var races = req.body.races;
-        var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races) values(($1),($2),($3),now(),0,0,0,0,($4))";
-        var arr = [email,nick,pwd,races];
+        var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races,salt) values(($1),($2),($3),now(),0,0,0,0,($4),($5))";
+        var salt = Math.round((new Date().valueOf() * Math.random()))+"";
+        var pwdHash = crypto.createHash('sha512').update(pwd+salt).digest('hex');
+        var arr = [email,nick,pwdHash,races,salt];
         var sqlcheck = 'select * from Player where email=($1)';
         try{
             const conn = await pool.connect();
@@ -303,7 +315,6 @@ router.post('/',async (req,res,next)=>{
             if(rows.length != 0){
                 conn.release();
                 res.send('email is already registered');
-                return;
             };
             await conn.query(sql,arr);
             req.session.email = email;
