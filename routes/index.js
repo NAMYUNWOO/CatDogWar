@@ -47,9 +47,9 @@ router.post('/scoreAdd',async (req,res,next)=>{
         usrScore = dogScore;
     else
         usrScore = catScore;
-    var sqlcat = "update Races set coin=coin+($1) where races ='cat'";
-    var sqldog = "update Races set coin=coin+($1) where races ='dog'";
-    var sqlusr = "update Player set coin=coin+($1) where email =($2)";
+    var sqlcat = "update Races set coin=coin+($1) where races='cat'";
+    var sqldog = "update Races set coin=coin+($1) where races='dog'";
+    var sqlusr = "update Player set coin=coin+($1) where email=($2)";
     try{
         const conn = await pool.connect();
         await conn.query(sqlusr,[usrScore,useremail]);
@@ -127,7 +127,7 @@ router.post('/gameresult',async (req,res,next)=>{
     var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3) where email=($4)";
     try{
         const conn = await pool.connect();
-        await conn.query(sql);
+        await conn.query(sql,[win,tie,lose,useremail]);
         conn.release();
         res.redirect('/');
 
