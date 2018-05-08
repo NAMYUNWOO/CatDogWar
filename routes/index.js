@@ -252,7 +252,7 @@ router.get('/game/:races', async (req,res,next)=>{
 
 router.post('/',async (req,res,next)=>{
     console.log("main page");
-    var email = req.body.email;
+    var email = "asdfasdf@nasdfas.com";//req.body.email;
     var pwd = req.body.pw;
     var pwdre = req.body.pw_re;
     if(pwdre==""){
