@@ -211,7 +211,7 @@ router.get('/game/:races', async (req,res,next)=>{
         for(let idx = 0 ; idx < rows.length;idx++){
             racesObj[rows[idx].races]=rows[idx].coin;
         }
-        var context = {'userInfo':userObj, 'racesInfo':racesObj};
+        var context = {'userInfo':usrObj, 'racesInfo':racesObj};
         console.log(context);
         res.render('game',context);
 
