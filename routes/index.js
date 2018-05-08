@@ -250,7 +250,8 @@ router.get('/game/:races', async (req,res,next)=>{
 
 })
 
-router.post('/',async (req,res,next)=>{
+router.post('/',(req,res,next)=>{
+    console.log("main page");
     var email = req.body.email;
     var pwd = req.body.pw;
     var pwdre = req.body.pw_re;
@@ -258,14 +259,19 @@ router.post('/',async (req,res,next)=>{
         console.log("sign in")
         var sql = 'select * from Player where email=($1) and pwd=($2)';
         var arr = [email,pwd];
-        const conn = await pool.connect();
-        const rows = await conn.query(sql,arr);
-        if(rows.length == 0){res.send('no email or password does not match');return;};
-        req.session.email = rows[0].email;
-        req.session.races = rows[0].races;
-        console.log(rows);
-        conn.release();
-        res.redirect('/');
+        try{
+            const conn = await pool.connect();
+            const rows = await conn.query(sql,arr);
+            if(rows.length == 0){res.send('no email or password does not match');return;};
+            req.session.email = rows[0].email;
+            req.session.races = rows[0].races;
+            console.log(rows);
+            conn.release();
+            res.redirect('/');
+        }catch (err){
+            console.error(err);
+            res.send("Error"+err);
+        }
         /*
         pool.getConnection((err,conn)=>{
             if(err){console.log(err);res.send(err);return;};
@@ -287,18 +293,23 @@ router.post('/',async (req,res,next)=>{
         var sql = "insert into Player(email,nick,pwd,regdate,win,tie,lose,coin,races) values(($1),($2),($3),now(),0,0,0,0,($4))";
         var arr = [email,nick,pwd,races];
         var sqlcheck = 'select * from Player where email=($1)';
-        const conn = await pool.connect();
-        const rows0 = await conn.query(sqlcheck,[email]);
-        if(rows0.length != 0){
+        try{
+            const conn = await pool.connect();
+            const rows0 = await conn.query(sqlcheck,[email]);
+            if(rows0.length != 0){
+                conn.release();
+                res.send('email is already registered');
+                return;
+            };
+            await conn.query(sql,arr);
+            req.session.email = email;
+            req.session.races = races; 
             conn.release();
-            res.send('email is already registered');
-            return;
-        };
-        await conn.query(sql,arr);
-        req.session.email = email;
-        req.session.races = races; 
-        conn.release();
-        res.redirect('/');
+            res.redirect('/');
+        }catch (err){
+            console.error(err);
+            res.send("Error"+err);
+        }
         /*
         pool.getConnection((err,conn)=>{
             if(err){console.log(err);res.send(err);return;};
