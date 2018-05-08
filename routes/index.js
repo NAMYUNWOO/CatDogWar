@@ -192,26 +192,26 @@ router.get('/game/:races', async (req,res,next)=>{
     if(!req.session.email)
         res.send('invalid access');
     var sqlusr = 'select * from Player where email=($1)';
-    var usrObj ={};
+    var usrInfo ={};
     var sqlraces = 'select * from Races';
     var racesObj ={};
     try{
         const conn = await pool.connect();
         var {rows} = await conn.query(sqlusr,[req.session.email]);
         if(rows.length == 0){res.send('no id or match');};
-        usrObj.email =rows[0].email;
-        usrObj.nick =rows[0].nick;
-        usrObj.win =rows[0].win;
-        usrObj.lose =rows[0].lose;
-        usrObj.tie =rows[0].tie;
-        usrObj.coin =rows[0].coin;
+        usrInfo.email =rows[0].email;
+        usrInfo.nick =rows[0].nick;
+        usrInfo.win =rows[0].win;
+        usrInfo.lose =rows[0].lose;
+        usrInfo.tie =rows[0].tie;
+        usrInfo.coin =rows[0].coin;
 
         var {rows} = await conn.query(sqlraces);
         conn.release();
         for(let idx = 0 ; idx < rows.length;idx++){
             racesObj[rows[idx].races]=rows[idx].coin;
         }
-        var context = {'userInfo':usrObj, 'racesInfo':racesObj};
+        var context = {'usrInfo':usrInfo, 'racesInfo':racesObj};
         console.log(context);
         res.render('game',context);
 
