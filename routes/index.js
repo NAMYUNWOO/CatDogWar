@@ -268,15 +268,14 @@ router.post('/',async (req,res,next)=>{
             const conn = await pool.connect();
             const {rows} = await conn.query(sql,arr);
             if(rows.length == 0){res.send('there is no user '+email);};
-            req.session.email = rows[0].email;
-            req.session.races = rows[0].races;
             var salt = rows[0].salt;
             var pwdHash = rows[0].pwd;
             var userHashPass = crypto.createHash("sha512").update(pwd+salt).digest("hex");
             conn.release();
             if(userHashPass === pwdHash){
+                req.session.email = rows[0].email;
+                req.session.races = rows[0].races;
                 res.redirect('/');    
-                
             }else{
                 res.send('wrong passward');
             }  
@@ -315,12 +314,13 @@ router.post('/',async (req,res,next)=>{
             if(rows.length != 0){
                 conn.release();
                 res.send('email is already registered');
-            };
-            await conn.query(sql,arr);
-            req.session.email = email;
-            req.session.races = races; 
-            conn.release();
-            res.redirect('/');
+            }else{
+                await conn.query(sql,arr);
+                req.session.email = email;
+                req.session.races = races; 
+                conn.release();
+                res.redirect('/');
+            }
         }catch (err){
             console.error(err);
             res.send("Error"+err);
