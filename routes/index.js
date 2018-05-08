@@ -119,21 +119,25 @@ router.post('/scoreAdd',async (req,res,next)=>{
 
 router.post('/gameresult',async (req,res,next)=>{
     if(!req.session.email)
-        res.send('invalid access');return;
-    var win = parseInt(req.body.win);
-    var tie = parseInt(req.body.tie);
-    var lose = parseInt(req.body.lose);
-    var useremail = req.session.email.toString();
-    var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3) where email=($4)";
-    try{
-        const conn = await pool.connect();
-        await conn.query(sql,[win,tie,lose,useremail]);
-        conn.release();
-        res.redirect('/');
+        res.send('invalid access');
+    else{
+        console.log("add result");
+        var win = parseInt(req.body.win);
+        var tie = parseInt(req.body.tie);
+        var lose = parseInt(req.body.lose);
+        var useremail = req.session.email.toString();
+        var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3) where email=($4)";
+        
+        try{
+            const conn = await pool.connect();
+            await conn.query(sql,[win,tie,lose,useremail]);
+            conn.release();
+            res.redirect('/');
 
-    }catch(err){
-        console.error(err);
-        res.send("Error"+err);
+        }catch(err){
+            console.error(err);
+            res.send("Error"+err);
+        }
     }
     /*
     pool.getConnection((err,conn)=>{
