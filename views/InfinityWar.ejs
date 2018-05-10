@@ -7,16 +7,28 @@
         <table class="table text-center"  style="width: 740px;">
           <thead class="thead-light">
           <tr>
-            <th>Total Cat Score</th>
-            <th>&nbsp;&nbsp;&nbsp;</th>
-            <th>Total Dog Score</th>
+            <% if (usrInfo.races == 'dog') {%>
+              <th id='ThanosHead'>Total Thanos Score</th>
+              <th>&nbsp;&nbsp;&nbsp;</th>
+              <th id='AvengersHead'>Total Avengers Score</th>
+            <%} else {%>
+              <th id='AvengersHead'>Total Avengers Score</th>
+              <th>&nbsp;&nbsp;&nbsp;</th>
+              <th id='ThanosHead'>Total Thanos Score</th>
+            <% } %>
           </tr>
         </thead>
         <tbody>
           <tr align="center">
-            <td id="catScore"><%=racesInfo.cat%></td>
-            <th>&nbsp;&nbsp;&nbsp;</th>
-            <td id="dogScore"><%=racesInfo.dog%></td>
+            <% if (usrInfo.races == 'dog') {%>
+              <td id="ThanosScore"><%=racesInfo.thanos%></td>
+              <th>&nbsp;&nbsp;&nbsp;</th>
+              <td id="AvengersScore"><%=racesInfo.avengers%></td>
+            <%} else {%>
+              <td id="AvengersScore"><%=racesInfo.avengers%></td>
+              <th>&nbsp;&nbsp;&nbsp;</th>
+              <td id="ThanosScore"><%=racesInfo.thanos%></td>
+            <% } %>
           </tr>
           </tbody>
         </table>
@@ -24,9 +36,9 @@
         <table class="table text-center" style="width: 360px;">
           <thead>
             <tr>
-              <th id="catScoreCur">0</th>
+              <th id="AvengersScoreCur">0</th>
               <th> : </th>
-              <th id="dogScoreCur">0</th>
+              <th id="ThanosScoreCur">0</th>
             </tr>
           </thead>
         </table>
@@ -55,8 +67,13 @@
             <tr>
               <td>&uarr;</td>
               <td>&darr;</td>
-              <td id='pushKey'>Q</td>
-              <td id='pullKey'>W</td>
+              <% if (usrInfo.races == 'dog') {%>
+                <td id='pushKey'>Q</td>
+                <td id='pullKey'>W</td>
+              <%} else {%>
+                <td id='pushKey'>W</td>
+                <td id='pullKey'>Q</td>
+              <% } %>
             </tr>
           </tbody>
         </table>
@@ -84,18 +101,14 @@
   </div>
   <% include ./footer.ejs %>
   <script>
-  if (document.location.href.endsWith("cat")){
-    document.getElementById('pushKey').innerHTML = "W";
-    document.getElementById('pullKey').innerHTML = "Q";
-  }
   var socket = io();
-  socket.on("updateTotScore", function(data) {
-    var catScore = data.cat;
-    var dogScore = data.dog;
-    var catScore_tot = document.getElementById('catScore').innerHTML;
-    var dogScore_tot = document.getElementById('dogScore').innerHTML;
-    document.getElementById('catScore').innerHTML = parseInt(catScore_tot)+parseInt(catScore);
-    document.getElementById('dogScore').innerHTML = parseInt(dogScore_tot)+parseInt(dogScore);
+  socket.on("updateTotScore2", function(data) {
+    var AvengersScore = data.AvengersScore;
+    var ThanosScore = data.ThanosScore;
+    var avenScore_tot = document.getElementById('AvengersScore').innerHTML;
+    var thanScore_tot = document.getElementById('ThanosScore').innerHTML;
+    document.getElementById('AvengersScore').innerHTML = parseInt(avenScore_tot)+parseInt(AvengersScore);
+    document.getElementById('ThanosScore').innerHTML = parseInt(thanScore_tot)+parseInt(ThanosScore);
 
     //var catScore_cur = document.getElementById('catScoreCur').innerHTML;
     //var dogScore_cur = document.getElementById('dogScoreCur').innerHTML;

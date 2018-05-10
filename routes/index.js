@@ -4,12 +4,14 @@ var io = require('../app.js').io;
 //var mysql = require('mysql');
 var crypto = require('crypto');
 const { Pool } = require('pg');
+var turn = -1;
 /*
 const pool = new Pool({
     connectionString: "postgres://127.0.0.1:5432/yunwoo",
     ssl: false
   });
 */
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
@@ -40,6 +42,7 @@ router.get('/myresult',(req,res,next)=>{
 })
 
 router.post('/scoreAdd',async (req,res,next)=>{
+    console.log("score add");
     var useremail = "" ;
     if(!req.session.email){
         console.log('no user info');
@@ -66,12 +69,12 @@ router.post('/scoreAdd',async (req,res,next)=>{
         if(dogZero){
             // catScore only
             await conn.query(sqlcat,[catScore]);
-            await conn.release();
+            conn.release();
             res.send('');
         }else if(catZero){
             // dogScore only
             await conn.query(sqldog,[dogScore]);
-            await conn.release();
+            conn.release();
             res.send('');
         }else{
             // bothScore
@@ -126,6 +129,79 @@ router.post('/scoreAdd',async (req,res,next)=>{
     */
 });
 
+router.post('/scoreAdd_Avengers',async (req,res,next)=>{
+    console.log("score add avengers");
+    var useremail = "" ;
+    if(!req.session.email){
+        console.log('no user info');
+    }else{
+        useremail = req.session.email.toString();
+    }
+    var AvengersScore = parseInt(req.body.AvengersScore);
+    var ThanosScore = parseInt(req.body.ThanosScore);
+    io.emit('updateTotScore2', { 'AvengersScore':AvengersScore ,'ThanosScore':ThanosScore });
+    var AvengersZero = AvengersScore == 0;
+    var ThanosZero = ThanosScore == 0;
+    var usrScore = AvengersScore;
+    
+    var sqlcat = "update Races set coin=coin+($1) where races='cat'";
+    var sqldog = "update Races set coin=coin+($1) where races='dog'";
+    var sqlthanos = "update Races set coin=coin+($1) where races='thanos'";
+    var sqlusr = "update Player set coin=coin+($1) where email=($2)";
+    try{
+        const conn = await pool.connect();
+        await conn.query(sqlusr,[usrScore,useremail]);
+        //if(result.affectedRows== 0){console.log('user score input fail');};
+        if(AvengersZero){
+            // catScore only
+            await conn.query(sqlthanos,[ThanosScore]);
+            conn.release();
+            res.send('');
+        }else if(ThanosZero){
+            // dogScore only
+            if(AvengersScore%2 == 0){
+                await conn.query(sqldog,[AvengersScore/2]);
+                await conn.query(sqlcat,[AvengersScore/2]);
+            }else{
+                var temp = AvengersScore + 1;
+                var temp2 = AvengersScore - 1;
+                if (turn == -1){
+                    await conn.query(sqldog,[temp/2]);
+                    await conn.query(sqlcat,[temp2/2]);
+                }else{
+                    await conn.query(sqldog,[temp2/2]);
+                    await conn.query(sqlcat,[temp/2]);
+                }
+                turn *= -1;
+            }
+            conn.release();
+            res.send('');
+        }else{
+            if(AvengersScore%2 == 0){
+                await conn.query(sqldog,[AvengersScore/2]);
+                await conn.query(sqlcat,[AvengersScore/2]);
+            }else{
+                var temp = AvengersScore + 1;
+                var temp2 = AvengersScore - 1;
+                if (turn == -1){
+                    await conn.query(sqldog,[temp/2]);
+                    await conn.query(sqlcat,[temp2/2]);
+                }else{
+                    await conn.query(sqldog,[temp2/2]);
+                    await conn.query(sqlcat,[temp/2]);
+                }
+                turn *= -1;
+            }
+            await conn.query(sqlthanos,[ThanosScore])
+            conn.release();
+            res.send('');
+        } 
+    }catch(err){
+        console.error(err);
+        res.send("Error"+err);
+    }
+});
+
 router.post('/gameresult',async (req,res,next)=>{
     if(!req.session.email)
         res.send('invalid access');
@@ -162,7 +238,7 @@ router.post('/gameresult',async (req,res,next)=>{
 });
 
 router.get('/demogame/:races', async (req,res,next)=>{
-    var sqlraces = 'select * from Races';
+    var sqlraces = "select * from Races where not races='thanos'";
     var racesObj ={};
     try{
         const conn = await pool.connect();
@@ -211,7 +287,7 @@ router.get('/game/:races', async (req,res,next)=>{
         res.send('invalid access');
     var sqlusr = 'select * from Player where email=($1)';
     var usrInfo ={};
-    var sqlraces = 'select * from Races';
+    var sqlraces = "select * from Races where not races='thanos'";
     var racesObj ={};
     try{
         const conn = await pool.connect();
@@ -272,6 +348,46 @@ router.get('/game/:races', async (req,res,next)=>{
     */
 
 })
+
+router.get('/InfinityWar', async (req,res,next)=>{
+
+    var sqlusr = 'select * from Player where email=($1)';
+    var usrInfo ={};
+    var sqlInfinityWar = "select  case when races='thanos' then 'thanos' else 'avengers' end as races,sum(coin) as coin from races group by case when races='thanos' then 'thanos' else 'avengers' end";
+    var racesObj ={};
+    try{
+        const conn = await pool.connect();
+        var {rows} = await conn.query(sqlusr,[req.session.email]);
+        if(rows.length == 0){res.send('no id or match');};
+        usrInfo.email =rows[0].email;
+        usrInfo.nick =rows[0].nick;
+        usrInfo.win =rows[0].win;
+        usrInfo.lose =rows[0].lose;
+        usrInfo.tie =rows[0].tie;
+        usrInfo.coin =rows[0].coin;
+        usrInfo.races =rows[0].races;
+
+        var {rows} = await conn.query(sqlInfinityWar);
+        for(let idx = 0 ; idx < rows.length;idx++){
+            racesObj[rows[idx].races]=rows[idx].coin;
+        }
+
+        conn.release();
+
+        var context = {'usrInfo':usrInfo, 'racesInfo':racesObj};
+        if(!req.session.email){
+            context['session'] = false;
+        }else{
+            context['session'] = true; 
+        }
+        res.render('InfinityWar',context);
+
+    }catch (err){
+        console.error(err);
+        res.send("Error"+err);
+    }
+})
+
 
 router.post('/',async (req,res,next)=>{
     console.log("main page");
