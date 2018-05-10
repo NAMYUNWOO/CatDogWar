@@ -285,7 +285,7 @@ router.get('/demogame/:races', async (req,res,next)=>{
 
 router.get('/game/:races', async (req,res,next)=>{
     if(!req.session.email)
-        res.send('invalid access');
+        res.send('Log in please');
     var sqlusr = 'select * from Player where email=($1)';
     var usrInfo ={};
     var sqlraces = "select * from Races where not races='thanos'";
@@ -351,7 +351,8 @@ router.get('/game/:races', async (req,res,next)=>{
 })
 
 router.get('/InfinityWar/:race', async (req,res,next)=>{
-
+    if(!req.session.email)
+        res.send('Log in please');
     var sqlusr = 'select * from Player where email=($1)';
     var usrInfo ={};
     var sqlInfinityWar = "select  case when races='thanos' then 'thanos' else 'avengers' end as races,sum(coin) as coin from races group by case when races='thanos' then 'thanos' else 'avengers' end";
