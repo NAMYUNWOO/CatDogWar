@@ -5,6 +5,7 @@ var io = require('../app.js').io;
 var crypto = require('crypto');
 const { Pool } = require('pg');
 var turn = -1;
+
 /*
 const pool = new Pool({
     connectionString: "postgres://127.0.0.1:5432/yunwoo",
@@ -16,7 +17,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
 });
-
 /*
 var pool  = mysql.createPool({
     connectionLimit : 10,
@@ -240,6 +240,7 @@ router.post('/gameresult',async (req,res,next)=>{
 router.get('/demogame/:races', async (req,res,next)=>{
     var sqlraces = "select * from Races where not races='thanos'";
     var racesObj ={};
+    req.session.races = req.params.races;
     try{
         const conn = await pool.connect();
         const {rows} = await conn.query(sqlraces);
@@ -248,7 +249,7 @@ router.get('/demogame/:races', async (req,res,next)=>{
         for(let idx = 0 ; idx < rows.length;idx++){
             racesObj[rows[idx].races]=rows[idx].coin;
         }
-        var context = { 'racesInfo':racesObj};
+        var context = { 'racesInfo':racesObj,'races':req.params.races};
         if(!req.session.email){
             context['session'] = false;
         }else{
@@ -305,7 +306,7 @@ router.get('/game/:races', async (req,res,next)=>{
         for(let idx = 0 ; idx < rows.length;idx++){
             racesObj[rows[idx].races]=rows[idx].coin;
         }
-        var context = {'usrInfo':usrInfo, 'racesInfo':racesObj};
+        var context = {'usrInfo':usrInfo, 'racesInfo':racesObj,'races':req.params.races};
         if(!req.session.email){
             context['session'] = false;
         }else{
@@ -349,7 +350,7 @@ router.get('/game/:races', async (req,res,next)=>{
 
 })
 
-router.get('/InfinityWar', async (req,res,next)=>{
+router.get('/InfinityWar/:race', async (req,res,next)=>{
 
     var sqlusr = 'select * from Player where email=($1)';
     var usrInfo ={};
@@ -374,7 +375,7 @@ router.get('/InfinityWar', async (req,res,next)=>{
 
         conn.release();
 
-        var context = {'usrInfo':usrInfo, 'racesInfo':racesObj};
+        var context = {'usrInfo':usrInfo, 'racesInfo':racesObj,'races':req.params.races};
         if(!req.session.email){
             context['session'] = false;
         }else{
@@ -485,7 +486,7 @@ router.get('/rank',async (req,res,next)=>{
         const conn = await pool.connect();
         var {rows} = await conn.query(sql);
         conn.release();
-        var context = {"rank":rows};
+        var context = {"rank":rows,'races':req.session.races};
         if(!req.session.email){
             context['session'] = false;
         }else{

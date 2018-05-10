@@ -36,9 +36,16 @@
         <table class="table text-center" style="width: 360px;">
           <thead>
             <tr>
-              <th id="AvengersScoreCur">0</th>
-              <th> : </th>
-              <th id="ThanosScoreCur">0</th>
+              <% if (usrInfo.races == 'dog') {%>
+                <th id="ThanosScoreCur">0</th>
+                <th> : </th>
+                <th id="AvengersScoreCur">0</th>
+              <%} else {%>
+                <th id="AvengersScoreCur">0</th>
+                <th> : </th>
+                <th id="ThanosScoreCur">0</th>
+              <% } %>
+
             </tr>
           </thead>
         </table>
