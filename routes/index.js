@@ -4,10 +4,17 @@ var io = require('../app.js').io;
 //var mysql = require('mysql');
 var crypto = require('crypto');
 const { Pool } = require('pg');
+/*
+const pool = new Pool({
+    connectionString: "postgres://127.0.0.1:5432/yunwoo",
+    ssl: false
+  });
+*/
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
 });
+
 /*
 var pool  = mysql.createPool({
     connectionLimit : 10,
@@ -26,6 +33,7 @@ router.get('/',(req,res,next)=>{
         res.render('index');
     }
 })
+
 
 router.get('/myresult',(req,res,next)=>{
     res.send('end game');
@@ -165,6 +173,11 @@ router.get('/demogame/:races', async (req,res,next)=>{
             racesObj[rows[idx].races]=rows[idx].coin;
         }
         var context = { 'racesInfo':racesObj};
+        if(!req.session.email){
+            context['session'] = false;
+        }else{
+            context['session'] = true; 
+        }
         console.log(context);
         res.render('demogame',context);
 
@@ -217,6 +230,11 @@ router.get('/game/:races', async (req,res,next)=>{
             racesObj[rows[idx].races]=rows[idx].coin;
         }
         var context = {'usrInfo':usrInfo, 'racesInfo':racesObj};
+        if(!req.session.email){
+            context['session'] = false;
+        }else{
+            context['session'] = true; 
+        }
         console.log(context);
         res.render('game',context);
 
@@ -345,6 +363,27 @@ router.post('/',async (req,res,next)=>{
 
 });
 
+router.get('/rank',async (req,res,next)=>{
+    var sql = "SELECT substring(email from 1 for position('@' in email)-3) || 'xx@xxx.x' as email,nick,win,lose,tie,coin  from player order by win DESC";
+    try{
+        const conn = await pool.connect();
+        var {rows} = await conn.query(sql);
+        conn.release();
+        var context = {"rank":rows};
+        if(!req.session.email){
+            context['session'] = false;
+        }else{
+            context['session'] = true; 
+        }
+        res.render("rank",context)
+    }catch (err){
+        console.error(err);
+        res.send("Error" + err);
+
+    }
+
+
+})
 router.post('/logout',(req,res,next)=>{
     req.session.destroy();
     res.redirect('/');

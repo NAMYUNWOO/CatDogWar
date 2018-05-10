@@ -1,0 +1,34 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand">Cat vs Dog</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        
+          <% if(session){ %>
+            <li class="nav-item">
+              <a class="nav-link" href="/">Game</a>
+            </li>
+          <% }else{ %>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Game
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/demogame/cat">Cat</a>
+                <a class="dropdown-item" href="/demogame/dog">Dog</a>
+              </div>
+            </li>
+          <% } %>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/rank">Rank</a>
+        </li>
+      </ul>
+    </div>
+    <% if(session){ %>
+      <form action="/logout" method="post">
+        <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Log out"></input>
+      </form>
+    <% }else{ %>
+      <a href="/" class="btn btn-outline-success my-2 my-sm-0" role="button">SignUp / Login</a>
+    <% } %>
+  </nav>
