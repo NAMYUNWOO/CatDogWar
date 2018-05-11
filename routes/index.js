@@ -17,6 +17,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
 });
+
 /*
 var pool  = mysql.createPool({
     connectionLimit : 10,
@@ -350,16 +351,19 @@ router.get('/game/:races', async (req,res,next)=>{
 
 })
 
-router.get('/InfinityWar/:race', async (req,res,next)=>{
+router.get('/InfinityWar/:races', async (req,res,next)=>{
     if(!req.session.email)
-        res.send('Log in please');
+        var email = req.params.races + "@" + req.params.races + ".com";
+    else
+        var email = req.session.email;
+    console.log(email);
     var sqlusr = 'select * from Player where email=($1)';
     var usrInfo ={};
     var sqlInfinityWar = "select  case when races='thanos' then 'thanos' else 'avengers' end as races,sum(coin) as coin from races group by case when races='thanos' then 'thanos' else 'avengers' end";
     var racesObj ={};
     try{
         const conn = await pool.connect();
-        var {rows} = await conn.query(sqlusr,[req.session.email]);
+        var {rows} = await conn.query(sqlusr,[email]);
         if(rows.length == 0){res.send('no id or match');};
         usrInfo.email =rows[0].email;
         usrInfo.nick =rows[0].nick;
