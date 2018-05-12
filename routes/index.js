@@ -12,10 +12,12 @@ const pool = new Pool({
     ssl: false
   });
 */  
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
 });
+
 /*
 var pool  = mysql.createPool({
     connectionLimit : 10,
@@ -504,6 +506,7 @@ router.get('/rank',async (req,res,next)=>{
 
 
 })
+
 router.post('/logout',(req,res,next)=>{
     req.session.destroy();
     res.redirect('/');
