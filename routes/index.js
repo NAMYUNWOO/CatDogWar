@@ -11,13 +11,11 @@ const pool = new Pool({
     connectionString: "postgres://127.0.0.1:5432/yunwoo",
     ssl: false
   });
-*/
-
+*/  
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
 });
-
 /*
 var pool  = mysql.createPool({
     connectionLimit : 10,

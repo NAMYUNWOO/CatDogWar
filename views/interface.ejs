@@ -1,0 +1,40 @@
+<table class="table" align="center" style="width: 740px;">
+        <thead class="thead-light">
+          <tr>
+            <th>up</th>
+            <th>down</th>
+            <% if (races == 'cat') { %>
+              <th>pull-beam</th>
+              <th>push-beam</th>
+            <% }else{ %>
+              <th>push-beam</th>
+              <th>pull-beam</th>
+            <%}%>
+
+          </tr>
+          <tr>
+            <th><img src="/images/<%=races%>up.png" id="up" style="width:3rem; height:3rem;"/></th>
+            <th><img src="/images/<%=races%>down.png" id="down" style="width:3rem; height:3rem;"/></th>
+            <% if (races == 'cat') { %>
+              <th><img src="/images/<%=races%>pull_intf.png" id="pullimg" style="width:5rem; height:2rem;"/></th>
+              <th><img src="/images/<%=races%>push_intf.png" id="pushimg" style="width:5rem; height:2rem;"/></th>
+            <% }else{ %>
+              <th><img src="/images/<%=races%>push_intf.png" id="pushimg" style="width:5rem; height:2rem;"/></th>
+              <th><img src="/images/<%=races%>pull_intf.png" id="pullimg" style="width:5rem; height:2rem;"/></th>
+            <%}%>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-size: 2em;">&uarr;</td>
+            <td style="font-size: 2em;">&darr;</td>
+            <% if (races == 'cat') { %>
+              <td id='pullKey' style="font-size: 2em;">W</td>
+              <td id='pushKey' style="font-size: 2em;">Q</td>
+            <% }else{ %>
+              <td id='pushKey' style="font-size: 2em;">Q</td>
+              <td id='pullKey' style="font-size: 2em;">W</td>
+            <%}%>
+          </tr>
+        </tbody>
+      </table>

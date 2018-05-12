@@ -32,34 +32,10 @@
         </table>
       </div>
       <div class="col-md-12" style="width: 740px; height: 460px">
-        <div class="webgl-content">
-          <div id="gameContainer" style="width: 640px; height: 360px"></div>
-          <div class="footer">
-        <!--<div class="webgl-logo"></div>-->
-            <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
-            <div class="title">CAT.DOG.WAR</div>
-          </div>
-        </div>
+          <% include ./unitygame.ejs %>
       </div>
       <div class="col-md-12 text-center">
-        <table class="table" align="center" style="width: 740px;">
-          <thead class="thead-light">
-            <tr>
-              <th>up</th>
-              <th>down</th>
-              <th>push-beam</th>
-              <th>pull-beam</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>&uarr;</td>
-              <td>&darr;</td>
-              <td id='pushKey'>Q</td>
-              <td id='pullKey'>W</td>
-            </tr>
-          </tbody>
-        </table>
+          <% include ./interface.ejs %> 
       </div>
       <br><br>
       <div class="col-md-12" >
