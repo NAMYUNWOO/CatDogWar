@@ -352,10 +352,13 @@ router.get('/game/:races', async (req,res,next)=>{
 })
 
 router.get('/InfinityWar/:races', async (req,res,next)=>{
-    if(!req.session.email)
+    if(!req.session.email){
         var email = req.params.races + "@" + req.params.races + ".com";
-    else
+        req.session.email = email;
+        req.session.races = req.params.races;
+    }else{
         var email = req.session.email;
+    }
     console.log(email);
     var sqlusr = 'select * from Player where email=($1)';
     var usrInfo ={};
