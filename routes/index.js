@@ -27,12 +27,22 @@ var pool  = mysql.createPool({
     database        : 'catdogwar'
 });
 */
+
+function sessionCheck(req){
+    if(!req.session.email || req.session.email == "cat@cat.com" || req.session.email == "dog@dog.com"){
+        return false;
+    }else{
+        return true; 
+    }
+}
+
 router.get('/',(req,res,next)=>{
-    if(req.session.email){
+    if(sessionCheck(req)){
         var cntxt = {'email':req.session.email,
             "races":req.session.races};
         res.redirect("/game/"+cntxt.races);
     }else{
+        req.session.destroy();
         res.render('index');
     }
 })
@@ -251,11 +261,7 @@ router.get('/demogame/:races', async (req,res,next)=>{
             racesObj[rows[idx].races]=rows[idx].coin;
         }
         var context = { 'racesInfo':racesObj,'races':req.params.races};
-        if(!req.session.email){
-            context['session'] = false;
-        }else{
-            context['session'] = true; 
-        }
+        context['session'] = sessionCheck(req);
         console.log(context);
         res.render('demogame',context);
 
@@ -308,11 +314,7 @@ router.get('/game/:races', async (req,res,next)=>{
             racesObj[rows[idx].races]=rows[idx].coin;
         }
         var context = {'usrInfo':usrInfo, 'racesInfo':racesObj,'races':req.params.races};
-        if(!req.session.email){
-            context['session'] = false;
-        }else{
-            context['session'] = true; 
-        }
+        context['session'] = sessionCheck(req);
         console.log(context);
         res.render('game',context);
 
@@ -384,11 +386,7 @@ router.get('/InfinityWar/:races', async (req,res,next)=>{
         conn.release();
 
         var context = {'usrInfo':usrInfo, 'racesInfo':racesObj,'races':req.params.races};
-        if(!req.session.email){
-            context['session'] = false;
-        }else{
-            context['session'] = true; 
-        }
+        context['session'] = sessionCheck(req);
         res.render('InfinityWar',context);
 
     }catch (err){
@@ -495,11 +493,7 @@ router.get('/rank',async (req,res,next)=>{
         var {rows} = await conn.query(sql);
         conn.release();
         var context = {"rank":rows,'races':req.session.races};
-        if(!req.session.email){
-            context['session'] = false;
-        }else{
-            context['session'] = true; 
-        }
+        context['session'] = sessionCheck(req);
         res.render("rank",context)
     }catch (err){
         console.error(err);
