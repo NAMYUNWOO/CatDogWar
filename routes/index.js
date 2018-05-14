@@ -487,7 +487,7 @@ router.post('/',async (req,res,next)=>{
 });
 
 router.get('/rank',async (req,res,next)=>{
-    var sql = "SELECT substring(email from 1 for position('@' in email)-1) || 'xx@xxx.x' as email,nick,win,lose,tie,coin  from player order by win DESC, coin DESC;";
+    var sql = "SELECT substring(email from 1 for position('@' in email) -LEAST(length(substring(email from 1 for position('@' in email)-1)),3)) || '@xxx.x' as email,nick,win,lose,tie,coin  from player order by win DESC, coin DESC;"
     try{
         const conn = await pool.connect();
         var {rows} = await conn.query(sql);
