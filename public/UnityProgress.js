@@ -10,10 +10,10 @@ function UnityProgress(gameInstance, progress) {
     gameInstance.progress = document.createElement("div");
     gameInstance.progress.className = "progress " + gameInstance.Module.splashScreenStyle;
     gameInstance.progress.empty = document.createElement("div");
-    gameInstance.progress.empty.className = "empty";
+    gameInstance.progress.empty.className = "empty_unity";
     gameInstance.progress.appendChild(gameInstance.progress.empty);
     gameInstance.progress.full = document.createElement("div");
-    gameInstance.progress.full.className = "full";
+    gameInstance.progress.full.className = "full_unity";
     gameInstance.progress.appendChild(gameInstance.progress.full);
     gameInstance.container.appendChild(gameInstance.progress);
   }
