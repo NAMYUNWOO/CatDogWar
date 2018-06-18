@@ -221,12 +221,16 @@ router.post('/gameresult',async (req,res,next)=>{
         var win = parseInt(req.body.win);
         var tie = parseInt(req.body.tie);
         var lose = parseInt(req.body.lose);
+        var stage = parseInt(req.body.stage);
         var useremail = req.session.email.toString();
-        var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3) where email=($4)";
-        
+        var sql_stage = "select stage from player where email=($4)";
+        var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3),stage=($4) where email=($5)";
         try{
             const conn = await pool.connect();
-            await conn.query(sql,[win,tie,lose,useremail]);
+            var {rows} = await conn.query(sql_stage,[req.session.email]);
+            if(rows.length == 0){res.send('no id or match');};
+            var stageMx =Math.max(rows[0].stage,stage);
+            await conn.query(sql,[win,tie,lose,stageMx,useremail]);
             conn.release();
             res.redirect('/');
 
@@ -487,7 +491,7 @@ router.post('/',async (req,res,next)=>{
 });
 
 router.get('/rank',async (req,res,next)=>{
-    var sql = "SELECT substring(email from 1 for position('@' in email) -LEAST(length(substring(email from 1 for position('@' in email)-1)),3)) || '@xxx.x' as email,nick,win,lose,tie,coin  from player order by win DESC, coin DESC;"
+    var sql = "SELECT substring(email from 1 for position('@' in email) -LEAST(length(substring(email from 1 for position('@' in email)-1)),3)) || '@xxx.x' as email,nick,win,lose,tie,coin,stage  from player order by stage DESC, win DESC, coin DESC;"
     try{
         const conn = await pool.connect();
         var {rows} = await conn.query(sql);
