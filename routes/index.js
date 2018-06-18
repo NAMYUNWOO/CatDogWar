@@ -223,7 +223,7 @@ router.post('/gameresult',async (req,res,next)=>{
         var lose = parseInt(req.body.lose);
         var stage = parseInt(req.body.stage);
         var useremail = req.session.email.toString();
-        var sql = "with sg1 as  (select * from player where email=($1))\
+        var sql = "with sg1 as  (select stage from player where email=($1))\
                     update player\
                         set win=win+($2),tie=tie+($3),lose=lose+($4),\
                             stage = (CASE \
