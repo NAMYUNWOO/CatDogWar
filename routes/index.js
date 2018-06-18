@@ -229,7 +229,7 @@ router.post('/gameresult',async (req,res,next)=>{
             const conn = await pool.connect();
             var {rows} = await conn.query(sql_stage,[req.session.email]);
             if(rows.length == 0){res.send('no id or match');};
-            var stageMx =Math.max(rows[0].stage,stage);
+            var stageMx =Math.max(parseInt(rows[0].stage),stage);
             await conn.query(sql,[win,tie,lose,stageMx,useremail]);
             conn.release();
             res.redirect('/');
