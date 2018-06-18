@@ -223,17 +223,19 @@ router.post('/gameresult',async (req,res,next)=>{
         var lose = parseInt(req.body.lose);
         var stage = parseInt(req.body.stage);
         var useremail = req.session.email.toString();
-        var sql_stage = "select stage from player where email=($4)";
-        var sql = "update Player set win=win+($1),tie=tie+($2),lose=lose+($3),stage=($4) where email=($5)";
+        var sql = "with sg1 as  (select * from player where email=($1))\
+                    update player\
+                        set win=win+($2),tie=tie+($3),lose=lose+($4),\
+                            stage = (CASE \
+                                        WHEN sg1.stage < ($5) THEN ($6) \
+                                        ELSE sg1.stage \
+                                    END) \
+                    from sg1 where player.email=($7)";
         try{
             const conn = await pool.connect();
-            var {rows} = await conn.query(sql_stage,[req.session.email]);
-            if(rows.length == 0){res.send('no id or match');};
-            var stageMx =Math.max(parseInt(rows[0].stage),stage);
-            await conn.query(sql,[win,tie,lose,stageMx,useremail]);
+            await conn.query(sql,[useremail,win,tie,lose,stage,stage,useremail]);
             conn.release();
             res.redirect('/');
-
         }catch(err){
             console.error(err);
             res.send("Error"+err);
