@@ -47,6 +47,9 @@ router.get('/',(req,res,next)=>{
     }
 })
 
+router.get('/slide',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/slide.html');
+})
 
 router.get('/myresult',(req,res,next)=>{
     res.send('end game');
