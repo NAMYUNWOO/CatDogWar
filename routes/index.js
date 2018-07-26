@@ -47,8 +47,20 @@ router.get('/',(req,res,next)=>{
     }
 })
 
-router.get('/slide',(req,res,next)=>{
-    res.sendFile(__dirname + '/slide/slide.html');
+router.get('/modeling',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/00_Prediction_Modeling.html');
+})
+router.get('/preprocessing_email',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/0_Email_Log_preprocessing.html');
+})
+router.get('/preprocessing_vdi',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/3_VDI_Log_preprocessing.html');
+})
+router.get('/preprocessing_mep',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/1_MobileEP_Log_preprocessing.html');
+})
+router.get('/preprocessing_token',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/2_Token_Log_preprocessing.html');
 })
 
 router.get('/myresult',(req,res,next)=>{
