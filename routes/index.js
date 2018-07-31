@@ -62,6 +62,9 @@ router.get('/preprocessing_mep',(req,res,next)=>{
 router.get('/preprocessing_token',(req,res,next)=>{
     res.sendFile(__dirname + '/slide/2_Token_Log_preprocessing.html');
 })
+router.get('/flow_analysis',(req,res,next)=>{
+    res.sendFile(__dirname + '/slide/3_flow.html');
+})
 
 router.get('/myresult',(req,res,next)=>{
     res.send('end game');
